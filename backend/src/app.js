@@ -2,7 +2,7 @@
 const express = require('express');
 const connectDB = require('./config/db');
 require('dotenv').config();
-const {userRoutes} =require('./routes/userRoutes');
+const userRoutes =require('./routes/userRoutes');
 
 
 //initialize express
@@ -23,4 +23,4 @@ app.get('/', (req, res) => {
 
 //setup port, log express server and send confirmation message.
 const PORT = process.env.PORT || 5000;
-app.listen(PORT,() => console.log('Server is running on port ${PORT}'));
+app.listen(PORT,() => console.log(`Server is running on port ${PORT}`));

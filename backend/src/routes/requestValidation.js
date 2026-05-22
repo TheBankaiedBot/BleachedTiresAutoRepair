@@ -1,5 +1,6 @@
 const {body, validationResult} = require('express-validator');
 
+
 const registerValidation = [
     body('firstName').trim().notEmpty().withMessage('First Name is Required'),
     body('lastName').trim().notEmpty().withMessage('Last Name is Required'),
@@ -9,10 +10,10 @@ const registerValidation = [
     body('zipcode').notEmpty().withMessage('Zipcode is Required')
 ];
 
-const registerHandler = async (req,res) => {
+const registerHandler = async (req,res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array()});
-
+    next();
 };
 
 module.exports = {registerValidation, registerHandler};
