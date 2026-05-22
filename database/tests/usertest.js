@@ -1,0 +1,1 @@
+{ "userid": 1,"username": "elijahthomas", "firstname": "Elijah", "lastname": "Thomas", "email": "randomemail@gmail.com", "phone":"555-555-5555", "zipcode": "12345"}

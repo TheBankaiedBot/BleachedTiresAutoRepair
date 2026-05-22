@@ -1,2 +1,1 @@
 This is the capstone project of my software engineering bootcamp. It is an appointment booking web app for an Auto Repair Service named "Bleached Tires". It also includes an AI feature to help you find what service you need.
-

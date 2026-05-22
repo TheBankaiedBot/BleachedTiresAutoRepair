@@ -1,4 +1,4 @@
-const {body, validationResult} = require('express-vaildator');
+const {body, validationResult} = require('express-validator');
 
 const registerValidation = [
     body('firstName').trim().notEmpty().withMessage('First Name is Required'),
@@ -13,5 +13,6 @@ const registerHandler = async (req,res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array()});
 
-   // create user
 };
+
+module.exports = {registerValidation, registerHandler};
