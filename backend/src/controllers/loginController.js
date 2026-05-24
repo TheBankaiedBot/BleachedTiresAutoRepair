@@ -1,15 +1,30 @@
 const User = require("../models/userModel");
 
-const valid = await User.comparePassword(password);
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-if(!valid) return res,status(401).json({message: 'Invalid credentials'});
-
-try {
-    const user = await User.create(requestAnimationFrame.body);
-    res.status(201).json(user);
-} catch (err) {
-    if (err.code ===11000 && err.keyPattern?.email){
-        return res.status(409).json({message: 'Email already taken'});
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
-    res.status(500).json({message: "Server error"});
-}
+
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const valid = await user.comparePassword(password);
+    if (!valid) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return res.status(200).json({ message: 'Login successful', token });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { loginUser };

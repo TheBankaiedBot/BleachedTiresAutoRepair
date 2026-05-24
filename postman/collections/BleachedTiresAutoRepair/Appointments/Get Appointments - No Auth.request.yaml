@@ -1,0 +1,18 @@
+$kind: http-request
+name: 'Get Appointments - No Auth (401)'
+method: GET
+url: '{{base_url}}/api/appointments/me'
+order: 8000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Unauthenticated request returns 401 Unauthorized", function () {
+        pm.response.to.have.status(401);
+      });
+
+      pm.test("No appointment data is leaked", function () {
+        const body = pm.response.text();
+        pm.expect(body).to.not.include("appointmentDate");
+        pm.expect(body).to.not.include("serviceId");
+      });

@@ -1,0 +1,24 @@
+$kind: http-request
+name: 'Cancel Appointment - Already Cancelled (400)'
+method: PATCH
+url: '{{base_url}}/api/appointments/{{appointment_id}}'
+order: 7000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Re-cancelling a cancelled appointment returns 400", function () {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("Error message indicates already cancelled or completed", function () {
+        const body = pm.response.text();
+        pm.expect(body.toLowerCase()).to.satisfy(function(b) {
+          return b.includes("cancelled") || b.includes("completed") || b.includes("cannot") || b.includes("already");
+        });
+      });

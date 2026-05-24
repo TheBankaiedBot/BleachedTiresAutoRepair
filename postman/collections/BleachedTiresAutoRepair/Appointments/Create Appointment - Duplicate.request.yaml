@@ -1,0 +1,36 @@
+$kind: http-request
+name: 'Create Appointment - Duplicate (409)'
+method: POST
+url: '{{base_url}}/api/appointments/'
+order: 2000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "serviceId": "{{service_id}}",
+      "appointmentDate": "2026-06-20",
+      "appointmentTime": "02:00 PM",
+      "customerNotes": "Second appointment attempt"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Duplicate scheduled appointment returns 409 Conflict", function () {
+        pm.response.to.have.status(409);
+      });
+
+      pm.test("Error message indicates conflict", function () {
+        const body = pm.response.text();
+        pm.expect(body.toLowerCase()).to.satisfy(function(b) {
+          return b.includes("duplicate") || b.includes("already") || b.includes("conflict") || b.includes("scheduled");
+        });
+      });

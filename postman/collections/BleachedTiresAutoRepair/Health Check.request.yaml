@@ -1,0 +1,20 @@
+$kind: http-request
+method: GET
+url: '{{base_url}}/'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", function () {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("API is running message returned", function () {
+        const text = pm.response.text();
+        pm.expect(text).to.include("APi is Running");
+      });
+
+      pm.test("Response time is under 500ms", function () {
+        pm.expect(pm.response.responseTime).to.be.below(500);
+      });

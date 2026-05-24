@@ -1,0 +1,5 @@
+$kind: collection
+name: Appointments
+description: |-
+  Appointment CRUD tests. All routes require a Bearer token (JWT).
+  Run "Register User" first, then set {{token}} in the collection variable before running these.

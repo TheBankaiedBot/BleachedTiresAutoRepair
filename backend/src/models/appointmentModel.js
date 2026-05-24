@@ -5,6 +5,7 @@ const appointmentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
+
     },
     serviceId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -20,6 +21,13 @@ const appointmentSchema = new mongoose.Schema({
     },
     customerNotes: String
 });
+// makes only 1 appointment available per user
+appointmentSchema.index(
+    {userId: 1},
+    {unique: true,
+        partialFilterExpression: {status: {$in : ["Scheduled"]}}
+    }
+)
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 module.exports = Appointment;

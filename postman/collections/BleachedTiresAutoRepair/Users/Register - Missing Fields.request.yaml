@@ -1,0 +1,56 @@
+$kind: http-request
+name: 'Register - Missing Fields (400)'
+method: POST
+url: '{{base_url}}/api/users/register'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "firstName": "",
+      "lastName": "",
+      "email": "not-an-email",
+      "password": "short",
+      "phone": "5558675309",
+      "zipcode": ""
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 400 Bad Request", function () {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("Response contains errors array", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("errors");
+        pm.expect(json.errors).to.be.an("array").that.is.not.empty;
+      });
+
+      pm.test("Validation error for firstName", function () {
+        const json = pm.response.json();
+        const fields = json.errors.map(e => e.path || e.param);
+        pm.expect(fields).to.include("firstName");
+      });
+
+      pm.test("Validation error for invalid email", function () {
+        const json = pm.response.json();
+        const fields = json.errors.map(e => e.path || e.param);
+        pm.expect(fields).to.include("email");
+      });
+
+      pm.test("Validation error for short password", function () {
+        const json = pm.response.json();
+        const fields = json.errors.map(e => e.path || e.param);
+        pm.expect(fields).to.include("password");
+      });
+
+      pm.test("Validation error for bad phone format", function () {
+        const json = pm.response.json();
+        const fields = json.errors.map(e => e.path || e.param);
+        pm.expect(fields).to.include("phone");
+      });

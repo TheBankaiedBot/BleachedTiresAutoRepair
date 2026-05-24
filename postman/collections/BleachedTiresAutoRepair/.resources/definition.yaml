@@ -1,0 +1,13 @@
+$kind: collection
+name: BleachedTiresAutoRepair API
+description: |-
+  Full API test suite for the BleachedTiresAutoRepair Node.js/Express backend.
+  Covers: Health Check, User Registration, and Appointment management (create, list, update, cancel).
+  Auth flow: Register → Login → use JWT token for protected routes.
+variables:
+  - key: base_url
+    value: 'http://localhost:5000'
+  - key: token
+    value: ''
+  - key: appointment_id
+    value: ''

@@ -1,0 +1,42 @@
+$kind: http-request
+method: PUT
+url: '{{base_url}}/api/appointments/{{appointment_id}}'
+order: 4000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "appointmentDate": "2026-06-18",
+      "appointmentTime": "11:30 AM",
+      "customerNotes": "Updated: also check tire pressure"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 OK", function () {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Updated fields are reflected in response", function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property("appointmentTime", "11:30 AM");
+        pm.expect(json).to.have.property("customerNotes", "Updated: also check tire pressure");
+      });
+
+      pm.test("Status remains Scheduled after update", function () {
+        const json = pm.response.json();
+        pm.expect(json.status).to.equal("Scheduled");
+      });
+
+      pm.test("Response time is under 1000ms", function () {
+        pm.expect(pm.response.responseTime).to.be.below(1000);
+      });

@@ -1,0 +1,33 @@
+$kind: http-request
+name: 'Register - Duplicate Email (409)'
+method: POST
+url: '{{base_url}}/api/users/register'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "jane.doe@example.com",
+      "password": "SecurePass1",
+      "phone": "555-867-5309",
+      "zipcode": "90210"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Duplicate email returns 409 Conflict or 400 Bad Request", function () {
+        pm.expect(pm.response.code).to.be.oneOf([400, 409]);
+      });
+
+      pm.test("Error message indicates duplicate", function () {
+        const body = pm.response.text();
+        pm.expect(body.toLowerCase()).to.satisfy(function(b) {
+          return b.includes("duplicate") || b.includes("already") || b.includes("exists") || b.includes("unique");
+        });
+      });

@@ -3,8 +3,8 @@ const express = require('express');
 const connectDB = require('./config/db');
 require('dotenv').config();
 const userRoutes =require('./routes/userRoutes');
-
-
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const authRoutes = require('./routes/authRoutes');
 //initialize express
 const app = express();
 app.use(express.json());
@@ -15,6 +15,8 @@ connectDB();
 
 //use routes
 app.use('/api/users', userRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/auth', authRoutes);    
 
 //health check on route
 app.get('/', (req, res) => {

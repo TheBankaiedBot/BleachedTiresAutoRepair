@@ -1,0 +1,34 @@
+$kind: http-request
+name: 'Update Appointment - Wrong User (403)'
+method: PUT
+url: '{{base_url}}/api/appointments/{{appointment_id}}'
+order: 5000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{other_user_token}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "appointmentDate": "2026-07-01",
+      "appointmentTime": "09:00 AM"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Another user cannot update this appointment (403)", function () {
+        pm.response.to.have.status(403);
+      });
+
+      pm.test("Error message indicates unauthorized", function () {
+        const body = pm.response.text();
+        pm.expect(body.toLowerCase()).to.satisfy(function(b) {
+          return b.includes("unauthorized") || b.includes("forbidden") || b.includes("not allowed");
+        });
+      });
