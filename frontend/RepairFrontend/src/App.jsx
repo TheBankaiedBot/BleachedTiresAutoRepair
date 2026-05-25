@@ -9,8 +9,9 @@ function App() {
   return (
     <>
     <div>
-      
+      <div className="header">
       <h1 id="center">|Bleached Tires!</h1>
+      </div>
       <BrowserRouter>
         <PageRoutes />
       </BrowserRouter>

@@ -3,26 +3,47 @@ import { useNavigate } from 'react-router-dom';
 import PageRoutes from '../../routes/pageRoutes';
 import AppointmentPage from '../nav-pages/appointmentPage';
 import ServicePage from '../nav-pages/servicesPage';
+import autoShopImg1 from '../../../assets/autoShopImg1.jpg';
+import autoShopImg2 from '../../../assets/autoShopImg2.jpg';
+import autoShopImg3 from '../../../assets/autoShopImg3.jpg';
 
 
 export default function DashboardPage(){
     const navigate = useNavigate();
 
     return(
-        <div>
-            <section>
-                <p>Left Navigation</p>
-                <button onClick={() => navigate('/appointmentPage')}>
-                    Book an Appointment!
+        <div className="dashboard-grid">
+
+        <div className="left-column">
+
+            <div className="info-box">
+                <img className="box-img" src={autoShopImg1} placeholder="AutoShopImg1"></img>
+                <button className="box-btn" onClick={() => navigate('/appointmentPage')}>
+                    View or Book an Appointment!
                 </button>
-                <p>Dashboard</p>
-            </section>
-            <section>
-                <p>Right Navigation</p>
-                    <button onClick={() => navigate('/servicesPage')}>
+            </div>
+
+            <div className="info-box">
+                <img className="box-img" src={autoShopImg2} placeholder="AutoShopImg2"></img>
+                    <button className="box-btn" onClick={() => navigate('/servicesPage')}>
                         Check out our Services!
                     </button>
-            </section>
+            </div>
+
+            <div className="info-box">
+                <img className="box-img" src={autoShopImg3} placeholder="AutoShopImg3"></img>
+                <button className="box-btn" onClick={() => navigate('/contactPage')}>
+                    Contact Us!
+                </button>
+            </div>
+
         </div>
-    )
+        <div className="right-column">
+            
+            <div className="ai-feature">
+            <p>AI Feature Coming Soon!</p>
+            </div>
+        </div>
+        </div>
+    );
 }

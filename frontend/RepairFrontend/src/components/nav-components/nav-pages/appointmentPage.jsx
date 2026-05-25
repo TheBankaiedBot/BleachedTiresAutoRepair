@@ -6,11 +6,13 @@ export default function AppointmentPage() {
 
     return (
         <div>
-            <div>
-                <button onClick={() => navigate('/')}>Go Back</button>
+            <div className="appointment-page">
+                <div>
+                    <button className="back-btn" onClick={() => navigate('/')}>Go Back</button>
+                </div>
+                <p>Book an Appointment!</p>
+                <button onClick="">Book Now</button>
             </div>
-            <p>Book an Appointment!</p>
-            <button onClick="">Book Now</button>
              
         </div>
     )
