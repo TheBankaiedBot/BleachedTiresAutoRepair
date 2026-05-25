@@ -4,7 +4,7 @@ const requireAuth = (req, res, next) => {
 console.log("token: ",token);
     
     try{
-       // if(!token) return res.status(401).json({message: 'Unauthorized token'});
+        if(!token) return res.status(401).json({message: 'Unauthorized token'});
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         req.user = {id: payload.id};
         
