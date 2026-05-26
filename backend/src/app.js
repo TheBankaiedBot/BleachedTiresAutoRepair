@@ -1,38 +1,53 @@
-//app.js
+// app.js
 const express = require('express');
+const cors = require('cors');
 const connectDB = require('./config/db');
 require('dotenv').config();
-const userRoutes =require('./routes/userRoutes');
+
+const userRoutes = require('./routes/userRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const authRoutes = require('./routes/authRoutes');
-//initialize express
+const serviceRoutes = require('./routes/serviceRoutes'); // FIXED
+
+// initialize express
 const app = express();
+
+// initialize CORS middleware
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
 app.use(express.json());
 
-//connect to DB
+// connect to DB
 connectDB();
 
-//AI logger to fix the issue of not logging request body in user registration route
+// AI logger
 app.use((req, res, next) => {
   console.log('Incoming request:', req.method, req.path, 'Content-Type:', req.headers['content-type']);
   next();
 });
 
-//use routes
+// use routes
 app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
-app.use('/api/auth', authRoutes);    
+app.use('/api/auth', authRoutes);
+app.use('/api/services', serviceRoutes); // FIXED
 
-//health check on route
+// health check
 app.get('/', (req, res) => {
-    res.send('APi is Running...');
+  res.send('API is Running...');
 });
 
-//setup port, log express server and send confirmation message.
-const PORT = process.env.PORT || 5000;
-//ai generated code for error handling middleware
+// error handling middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err && err.stack ? err.stack : err);
   res.status(500).json({ message: 'Internal Server Error', error: err?.message || 'unknown' });
 });
-app.listen(PORT,() => console.log(`Server is running on port ${PORT}`));
+
+// start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

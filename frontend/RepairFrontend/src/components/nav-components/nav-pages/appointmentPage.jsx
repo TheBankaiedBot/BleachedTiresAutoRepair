@@ -10,10 +10,16 @@ export default function AppointmentPage() {
   const [appointmentTime, setAppointmentTime] = useState("");
   const [customerNotes, setCustomerNotes] = useState("");
   const [message, setMessage] = useState("");
+  const [services, setServices] = useState([]);
 
   // Appointments list
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  //service list state
+  const serviceNames = Object.fromEntries(
+  services.map(s => [s._id, s.name])
+  );
 
   // Editing state
   const [editingId, setEditingId] = useState(null);
@@ -45,6 +51,24 @@ export default function AppointmentPage() {
     };
 
     fetchAppointments();
+
+    const fetchServices = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/services");
+      const data = await res.json();
+
+      if (res.ok) {
+        setServices(data.services || []);
+      } else {
+        console.error(data.message);
+      }
+    } catch (err) {
+      console.error("Service fetch error:", err);
+    }
+    };
+
+fetchServices();
+
   }, []);
 
   // Create appointment
@@ -167,6 +191,7 @@ export default function AppointmentPage() {
     setMessage("Server unreachable");
   }
   };
+  
 
   
 
@@ -179,11 +204,19 @@ export default function AppointmentPage() {
       <h2>{editingId ? "Edit Appointment" : "Book an Appointment"}</h2>
 
       <div className="form-container">
-        <input
-          placeholder="Service ID"
+        <select
           value={serviceId}
           onChange={(e) => setServiceId(e.target.value)}
-        />
+          >
+          <option value="">Select a service</option>
+
+          {services.map((service) => (
+            <option key={service._id} value={service._id}>
+              {service.name}
+            </option>
+          ))}
+        </select>
+
 
         <input
           type="date"
@@ -236,7 +269,7 @@ export default function AppointmentPage() {
 
       {appointments.map((appt) => (
   <div key={appt._id} className="appointment-card">
-    <p><strong>Service:</strong> {appt.serviceId}</p>
+    <p><strong>Service:</strong> {serviceNames[appt.serviceId] || "Unknown Service"}</p>
     <p><strong>Date:</strong> {appt.appointmentDate}</p>
     <p><strong>Time:</strong> {appt.appointmentTime}</p>
     <p><strong>Status:</strong> {appt.status}</p>
