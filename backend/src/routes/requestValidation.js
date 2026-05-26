@@ -18,11 +18,18 @@ const registerValidation = [
     body('zipcode').notEmpty().withMessage('Zipcode is Required')
 ];
 
-const registerHandler = async (req,res, next) => {
-    console.log("VALIDATING /register request");
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array()});
-    next();
+const registerHandler = (req, res, next) => {
+  console.log("VALIDATING /register request");
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.log("Validation errors:", errors.array());
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  next();
 };
+
 
 module.exports = {registerValidation, registerHandler};

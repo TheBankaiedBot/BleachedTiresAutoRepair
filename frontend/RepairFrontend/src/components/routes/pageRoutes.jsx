@@ -6,6 +6,7 @@ import ContactPage from "../nav-components/nav-pages/contactPage";
 import AIPage from "../nav-components/nav-pages/AI-ComponentPage";
 import ProtectedRoute from "./protectedRoute";
 import LoginPage from "../nav-components/nav-pages/loginPage";
+import SignupPage from "../../Auth/SignupPage";
 
 export default function PageRoutes(){
     return(
@@ -18,7 +19,8 @@ export default function PageRoutes(){
                     <Route path="/contactPage" element={<ProtectedRoute><ContactPage /></ProtectedRoute>} />
                     <Route path="/AIPage" element={<ProtectedRoute><AIPage /></ProtectedRoute>} />
                     <Route path="/login" element={<LoginPage />} />
-                    
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="*" element={<h1>404 Not Found</h1>} /> {/* catch-all route for undefined paths */}
                 </Routes>
            
         </BrowserRouter>

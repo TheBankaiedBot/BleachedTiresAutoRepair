@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  createAppointment,
+  getMyAppointments,
+  updateAppointment,
+  cancelAppointment,
+  getServices
+} from "../../../api/api";
 
 export default function AppointmentPage() {
   const navigate = useNavigate();
@@ -16,104 +23,70 @@ export default function AppointmentPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //service list state
-  const serviceNames = Object.fromEntries(
-  services.map(s => [s._id, s.name])
-  );
-
   // Editing state
   const [editingId, setEditingId] = useState(null);
 
-  // Load appointments on mount
+  // Map service IDs → names
+  const serviceNames = Object.fromEntries(
+    services.map((s) => [s._id, s.name])
+  );
+
+  // ------------------ LOAD APPOINTMENTS + SERVICES ------------------
   useEffect(() => {
-    const fetchAppointments = async () => {
-      const token = localStorage.getItem("token");
-
-      try {
-        const res = await fetch("http://localhost:5000/api/appointments/me", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          setAppointments(data.appointments || []);
-        } else {
-          console.error(data.message);
-        }
-      } catch (err) {
-        console.error("Server error:", err);
-      }
-
-      setLoading(false);
-    };
-
-    fetchAppointments();
-
-    const fetchServices = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/services");
-      const data = await res.json();
-
-      if (res.ok) {
-        setServices(data.services || []);
-      } else {
-        console.error(data.message);
-      }
-    } catch (err) {
-      console.error("Service fetch error:", err);
-    }
-    };
-
-fetchServices();
-
+    loadAppointments();
+    loadServices();
   }, []);
 
-  // Create appointment
-  const handleBook = async () => {
-    const token = localStorage.getItem("token");
+  const loadAppointments = async () => {
+    const result = await getMyAppointments();
 
-    try {
-      const res = await fetch("http://localhost:5000/api/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          serviceId,
-          appointmentDate,
-          appointmentTime,
-          customerNotes
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setMessage(data.message || "Something went wrong");
-        return;
-      }
-
-      setMessage("Appointment booked successfully!");
-
-      // Add new appointment to list
-      setAppointments(prev => [...prev, data.appointment]);
-
-      // Reset form
-      setServiceId("");
-      setAppointmentDate("");
-      setAppointmentTime("");
-      setCustomerNotes("");
-
-    } catch (err) {
-      setMessage("Server unreachable");
+    if (!result.success) {
+      setMessage(result.message);
+      setLoading(false);
+      return;
     }
+
+    setAppointments(result.appointments || []);
+    setLoading(false);
   };
 
-  // Load appointment into form for editing
+  const loadServices = async () => {
+    const result = await getServices();
+
+    if (!result.success) {
+      setMessage(result.message);
+      return;
+    }
+
+    setServices(result.services || []);
+  };
+
+  // ------------------ CREATE APPOINTMENT ------------------
+  const handleBook = async () => {
+    setMessage("");
+
+    const result = await createAppointment({
+      serviceId,
+      appointmentDate,
+      appointmentTime,
+      customerNotes
+    });
+
+    if (!result.success) {
+      setMessage(result.message);
+      return;
+    }
+
+    setMessage("Appointment booked successfully!");
+
+    // Add new appointment to UI
+    setAppointments((prev) => [...prev, result.data.appointment]);
+
+    // Reset form
+    resetForm();
+  };
+
+  // ------------------ EDIT APPOINTMENT ------------------
   const startEdit = (appt) => {
     setEditingId(appt._id);
     setServiceId(appt.serviceId);
@@ -122,79 +95,59 @@ fetchServices();
     setCustomerNotes(appt.customerNotes);
   };
 
-  // Save updated appointment
   const handleUpdate = async () => {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`http://localhost:5000/api/appointments/${editingId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        serviceId,
-        appointmentDate,
-        appointmentTime,
-        customerNotes
-      })
+    const result = await updateAppointment(editingId, {
+      serviceId,
+      appointmentDate,
+      appointmentTime,
+      customerNotes
     });
 
-    const data = await res.json();
-
-    if (res.ok) {
-      setMessage("Appointment updated successfully");
-
-      // Update UI list
-      setAppointments(prev =>
-        prev.map(a => a._id === editingId ? data.appointment : a)
-      );
-
-      // Reset form
-      setEditingId(null);
-      setServiceId("");
-      setAppointmentDate("");
-      setAppointmentTime("");
-      setCustomerNotes("");
-
-    } else {
-      setMessage(data.message || "Update failed");
+    if (!result.success) {
+      setMessage(result.message);
+      return;
     }
+
+    setMessage("Appointment updated successfully");
+
+    // Update UI
+    setAppointments((prev) =>
+      prev.map((a) =>
+        a._id === editingId ? result.data.appointment : a
+      )
+    );
+
+    resetForm();
   };
 
+  // ------------------ CANCEL APPOINTMENT ------------------
   const handleCancel = async (id) => {
-  const token = localStorage.getItem("token");
+    const result = await cancelAppointment(id);
 
-  try {
-    const res = await fetch(`http://localhost:5000/api/appointments/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      setMessage("Appointment cancelled");
-
-      // Update UI list
-      setAppointments(prev =>
-        prev.map(a =>
-          a._id === id ? { ...a, status: "Cancelled" } : a
-        )
-      );
-    } else {
-      setMessage(data.message || "Cancel failed");
+    if (!result.success) {
+      setMessage(result.message);
+      return;
     }
-  } catch (err) {
-    setMessage("Server unreachable");
-  }
+
+    setMessage("Appointment cancelled");
+
+    setAppointments((prev) =>
+      prev.map((a) =>
+        a._id === id ? { ...a, status: "Cancelled" } : a
+      )
+    );
   };
-  
 
-  
+  // ------------------ RESET FORM ------------------
+  const resetForm = () => {
+    setEditingId(null);
+    setServiceId("");
+    setAppointmentDate("");
+    setAppointmentTime("");
+    setCustomerNotes("");
+  };
 
+  // ------------------ UI ------------------
   return (
     <div className="appointment-page">
       <button className="back-btn" onClick={() => navigate("/")}>
@@ -207,16 +160,14 @@ fetchServices();
         <select
           value={serviceId}
           onChange={(e) => setServiceId(e.target.value)}
-          >
+        >
           <option value="">Select a service</option>
-
           {services.map((service) => (
             <option key={service._id} value={service._id}>
               {service.name}
             </option>
           ))}
         </select>
-
 
         <input
           type="date"
@@ -243,17 +194,7 @@ fetchServices();
         )}
 
         {editingId && (
-          <button
-            onClick={() => {
-              setEditingId(null);
-              setServiceId("");
-              setAppointmentDate("");
-              setAppointmentTime("");
-              setCustomerNotes("");
-            }}
-          >
-            Cancel Edit
-          </button>
+          <button onClick={resetForm}>Cancel Edit</button>
         )}
 
         {message && <p>{message}</p>}
@@ -268,26 +209,20 @@ fetchServices();
       )}
 
       {appointments.map((appt) => (
-  <div key={appt._id} className="appointment-card">
-    <p><strong>Service:</strong> {serviceNames[appt.serviceId] || "Unknown Service"}</p>
-    <p><strong>Date:</strong> {appt.appointmentDate}</p>
-    <p><strong>Time:</strong> {appt.appointmentTime}</p>
-    <p><strong>Status:</strong> {appt.status}</p>
+        <div key={appt._id} className="appointment-card">
+          <p><strong>Service:</strong> {serviceNames[appt.serviceId] || "Unknown Service"}</p>
+          <p><strong>Date:</strong> {appt.appointmentDate}</p>
+          <p><strong>Time:</strong> {appt.appointmentTime}</p>
+          <p><strong>Status:</strong> {appt.status}</p>
 
-    <button onClick={() => startEdit(appt)}>Edit</button>
-
-    <button onClick={() => handleCancel(appt._id)}>
-      Cancel
-    </button>
-
-    {appt.status !== "Cancelled" && (
-  <>
-    <button onClick={() => startEdit(appt)}>Edit</button>
-    <button onClick={() => handleCancel(appt._id)}>Cancel</button>
-  </>
-)}
-  </div>
-))}
+          {appt.status !== "Cancelled" && (
+            <>
+              <button onClick={() => startEdit(appt)}>Edit</button>
+              <button onClick={() => handleCancel(appt._id)}>Cancel</button>
+            </>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

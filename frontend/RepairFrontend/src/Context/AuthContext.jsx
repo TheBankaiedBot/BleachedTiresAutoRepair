@@ -4,7 +4,7 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // TEMP DEV TOKEN
+  
   const [token, setToken] = useState(() => localStorage.getItem("token")); {/*() => localStorage.getItem("token")*/}
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,11 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (!data.token) {
+        setError("Signup succeeded but no token was returned");
+        return;
+      }
+    const payload = JSON.parse(atob(data.token.split(".")[1]));
       setUser({ id: payload.id });
     } catch {
       setUser(null);

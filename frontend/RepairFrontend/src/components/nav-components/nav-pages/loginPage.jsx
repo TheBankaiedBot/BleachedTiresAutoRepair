@@ -1,48 +1,75 @@
-import { useContext, useState } from "react";
+import { useState, useContext } from "react";
 import { AuthContext } from "../../../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { login } from "../../../api/api";
 
 export default function LoginPage() {
-  console.log("LoginPage mounted");
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { setToken, setUser } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    const res = await login(email, password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    if (res.token) {
-      // SUCCESS → go to dashboard
-      navigate("/");
-    } else {
-      // FAILURE → show message
-      setMessage(res.message || "Login failed");
+    const result = await login(email, password);
+
+    //  Login failed
+    if (!result.success) {
+      setError(result.message || "Login failed");
+      setLoading(false);
+      return;
     }
+
+    //  Login succeeded
+    const token = result.data.token;
+    setToken(token);
+
+    // Decode token
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    setUser({ id: payload.id });
+
+    setLoading(false);
+    navigate("/dashboard");
   };
 
   return (
-    <div className="login-page">
+    <div style={{ padding: "20px" }}>
       <h2>Login</h2>
 
-      <input
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        value={email}
-      />
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <input
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        type="password"
-        value={password}
-      />
+      <form onSubmit={handleSubmit}>
+        <input
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-      <button onClick={handleSubmit}>Login</button>
+        <input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-      {message && <p style={{ color: "red" }}>{message}</p>}
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
+
+      <p>
+        Don’t have an account?{" "}
+        <a href="/signup">Sign up</a>
+      </p>
     </div>
   );
 }
