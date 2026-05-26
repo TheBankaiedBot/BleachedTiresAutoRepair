@@ -3,7 +3,6 @@ const Appointment = require("../models/appointmentModel");
 
 
 const createAppointment = async (req, res) => {
-const Appointment = require("../models/appointmentModel");
 const { create } = require("../models/userModel");
 
 

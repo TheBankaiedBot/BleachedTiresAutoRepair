@@ -29,16 +29,15 @@ const userSchema = new mongoose.Schema({
 
 
 // Before saving a user, hash the password if it was created or changed.
-userSchema.pre("save", async function (next){
-    if (!this.isModified('password')) return next();
-
-    try{
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (err){
-        next(err);
-    }
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  } catch (err) {
+    // Let Mongoose handle the rejected promise — it will treat this as an error
+    throw err;
+  }
 });
 
 // Add a helper method to instances of User so we can compare passwords during login.
