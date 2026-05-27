@@ -1,6 +1,6 @@
 // src/api/api.js
 
-export const BASE_URL = "https://bleachedtiresautorepair.onrender.com";
+export const BASE_URL = "https://bleachedtiresautorepair.onrender.com/api";
 
 // Helper to attach token
 export const authHeader = () => {
