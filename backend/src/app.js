@@ -35,6 +35,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/services', serviceRoutes); 
 
+//ai
+const aiRoutes = require("./routes/aiRoutes");
+app.use("/api/ai", aiRoutes);
+
+
 // health check
 app.get('/', (req, res) => {
   res.send('API is Running...');

@@ -8,6 +8,8 @@ import ServicePage from '../nav-pages/servicesPage';
 import autoShopImg1 from '../../../assets/autoShopImg1.jpg';
 import autoShopImg2 from '../../../assets/autoShopImg2.jpg';
 import autoShopImg3 from '../../../assets/autoShopImg3.jpg';
+import AiFrontImg from '../../../assets/AiFrontImg.webp';
+
 
 
 export default function DashboardPage(){
@@ -59,7 +61,12 @@ export default function DashboardPage(){
         <div className="right-column">
             
             <div className="ai-feature">
-            <p>AI Feature Coming Soon!</p>
+            
+                <img className="box-img"  src={AiFrontImg} placeholder="AI"></img>
+                <button className="box-btn" onClick={() => navigate('/AIPage')}>
+                    Figure out what service you need with our AI helper!
+                </button>
+            
             </div>
         </div>
         </div>

@@ -64,6 +64,7 @@ body {
     width: 100%;
     border-radius: 10px;
     padding: 20px;
+    height: 50%
 }
 
 .contact-page {
@@ -104,4 +105,58 @@ body {
 
 .service-card h3 {
   margin-bottom: 10px;
+}
+
+.ai-page {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.ai-textarea {
+  width: 100%;
+  height: 120px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.ai-btn {
+  margin-top: 10px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.ai-result {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f3f3f3;
+  border-radius: 8px;
+}
+
+.ai-book-btn {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.ai-book-btn:hover {
+  background: #0056b3;
+}
+
+.ai-box {
+    display: flex;
+    flex-direction: column;
+    height:200px; 
+    gap: 10px;
+    background-color: gray;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
