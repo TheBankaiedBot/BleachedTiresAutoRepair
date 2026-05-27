@@ -1,11 +1,9 @@
-
 import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  
-  const [token, setToken] = useState(() => localStorage.getItem("token")); {/*() => localStorage.getItem("token")*/}
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,13 +15,10 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      if (!data.token) {
-        setError("Signup succeeded but no token was returned");
-        return;
-      }
-    const payload = JSON.parse(atob(data.token.split(".")[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       setUser({ id: payload.id });
-    } catch {
+    } catch (err) {
+      console.error("Invalid token:", err);
       setUser(null);
       localStorage.removeItem("token");
     }
@@ -31,10 +26,10 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, [token]);
 
-  // ⭐ Your login function with error handling
+  // Login function
   const login = async (email, password) => {
     try {
-      const res = await fetch("http://localhost:5000/api/users/login/me", {
+      const res = await fetch("http://localhost:5000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -43,37 +38,22 @@ export function AuthProvider({ children }) {
 
       const data = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok || !data.success) {
         return {
           success: false,
           message: data.message || "Login failed"
         };
       }
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        setToken(data.token);
+      const jwt = data.data.token;
 
-        try {
-          const payload = JSON.parse(atob(data.token.split(".")[1]));
-          setUser({ id: payload.id });
-        } catch {
-          return {
-            success: false,
-            message: "Invalid token format"
-          };
-        }
+      localStorage.setItem("token", jwt);
+      setToken(jwt);
 
-        return {
-          success: true,
-          token: data.token
-        };
-      }
+      const payload = JSON.parse(atob(jwt.split(".")[1]));
+      setUser({ id: payload.id });
 
-      return {
-        success: false,
-        message: "No token returned from server"
-      };
+      return { success: true };
 
     } catch (err) {
       return {

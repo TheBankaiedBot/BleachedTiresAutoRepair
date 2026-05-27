@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { match } = require('node:assert');
 const bcrypt = require("bcrypt");
 
 // Define the User schema for MongoDB using Mongoose.
@@ -18,7 +17,7 @@ const userSchema = new mongoose.Schema({
         // and is hidden from query results by default.
         password: {type: String, required: true, minlength: 8, select: false},
         // Phone number is required and must match the specified format.
-        phone: {type: String, required: true,
+        phone: {type: String, 
             match: [/^\d{3}-\d{3}-\d{4}$/, 'Please fill a valid phone number (e.g. 555-555-5555)']
         },
         // Zipcode is required for customer address/region data.

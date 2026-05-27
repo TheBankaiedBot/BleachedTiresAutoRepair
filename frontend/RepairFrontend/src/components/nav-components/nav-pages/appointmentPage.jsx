@@ -211,7 +211,7 @@ export default function AppointmentPage() {
       {appointments.map((appt) => (
         <div key={appt._id} className="appointment-card">
           <p><strong>Service:</strong> {serviceNames[appt.serviceId] || "Unknown Service"}</p>
-          <p><strong>Date:</strong> {appt.appointmentDate}</p>
+          <p><strong>Date:</strong> {new Date(appt.appointmentDate).toISOString().split("T")[0]}</p>
           <p><strong>Time:</strong> {appt.appointmentTime}</p>
           <p><strong>Status:</strong> {appt.status}</p>
 

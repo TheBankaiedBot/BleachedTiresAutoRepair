@@ -6,8 +6,7 @@ require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
-const authRoutes = require('./routes/authRoutes');
-const serviceRoutes = require('./routes/serviceRoutes'); // FIXED
+const serviceRoutes = require('./routes/serviceRoutes'); // FIX
 
 // initialize express
 const app = express();
@@ -15,7 +14,7 @@ const app = express();
 // initialize CORS middleware
 app.use(cors({
   origin: "http://localhost:5173",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
@@ -34,8 +33,7 @@ app.use((req, res, next) => {
 // use routes
 app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/services', serviceRoutes); // FIXED
+app.use('/api/services', serviceRoutes); 
 
 // health check
 app.get('/', (req, res) => {

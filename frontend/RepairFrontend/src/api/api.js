@@ -8,8 +8,6 @@ export const authHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-
-
 // ---------------------- AUTH ----------------------
 
 export async function login(email, password) {
@@ -22,16 +20,17 @@ export async function login(email, password) {
 
     const data = await res.json();
 
-    if (!res.ok) {
-      return { success: false, message: data.message || "Login failed" };
-    }
-
-    if (data.token) localStorage.setItem("token", data.token);
-
-    return { success: true, data };
+    return {
+      ok: res.ok,
+      ...data
+    };
 
   } catch {
-    return { success: false, message: "Unable to reach server" };
+    return {
+      ok: false,
+      success: false,
+      message: "Unable to reach server"
+    };
   }
 }
 

@@ -67,7 +67,7 @@ export default function ServicesPage() {
 
             <button
               onClick={() =>
-                navigate("/appointment", {
+                navigate("/appointmentPage", {
                   state: { serviceId: service._id }
                 })
               }

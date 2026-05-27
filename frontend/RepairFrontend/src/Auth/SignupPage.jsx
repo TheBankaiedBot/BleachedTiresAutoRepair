@@ -1,11 +1,9 @@
-import { useState, useContext } from "react";
-import { AuthContext } from "../Context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { login, BASE_URL } from "../api/api";
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const { setToken, setUser } = useContext(AuthContext);
+  const location = useLocation();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -29,111 +27,73 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${BASE_URL}/users/register`, {
+      const response = await fetch("http://localhost:5000/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      // ❌ Backend error
-      if (!res.ok) {
+      // express-validator errors
+      if (data.errors && data.errors.length > 0) {
+        setError(data.errors[0].msg);
+        setLoading(false);
+        return;
+      }
+
+      // backend controller errors
+      if (!response.ok || !data.success) {
         setError(data.message || "Signup failed");
         setLoading(false);
         return;
       }
 
-      // ✔ Signup succeeded — backend returned token + user
-      if (!data.token) {
-        setError("Signup succeeded but no token was returned");
-        setLoading(false);
-        return;
-      }
-
-      // Save token
-      localStorage.setItem("token", data.token);
-      setToken(data.token);
-
-      // Decode token
-      const payload = JSON.parse(atob(data.token.split(".")[1]));
-      setUser({ id: payload.id });
-
-      setLoading(false);
-      navigate("/dashboard");
+      // SUCCESS → redirect back to where user came from
+      const from = location.state?.from || "/";
+      navigate(from, { replace: true });
 
     } catch (err) {
-      setError("Unable to reach server");
-      setLoading(false);
+      console.error("Signup error:", err);
+      setError("Network error — please try again");
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="signup-page">
+    <div style={{ padding: "20px" }}>
       <h2>Create an Account</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <form onSubmit={handleSubmit}>
-        <input
-          name="firstName"
-          placeholder="First Name"
-          value={form.firstName}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="lastName"
-          placeholder="Last Name"
-          value={form.lastName}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="phone"
-          placeholder="Phone Number"
-          value={form.phone}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="zipcode"
-          placeholder="Zip Code"
-          value={form.zipcode}
-          onChange={handleChange}
-          required
-        />
+        <input name="firstName" placeholder="First Name" onChange={handleChange} required />
+        <input name="lastName" placeholder="Last Name" onChange={handleChange} required />
+        <input name="email" placeholder="Email" type="email" onChange={handleChange} required />
+        <input name="password" placeholder="Password" type="password" onChange={handleChange} required />
+        <input name="phone" placeholder="555-555-5555" onChange={handleChange} />
+        <input name="zipcode" placeholder="Zipcode" onChange={handleChange} required />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Signing up..." : "Sign Up"}
+          {loading ? "Creating account..." : "Sign Up"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          style={{
+            marginTop: "10px",
+            background: "transparent",
+            border: "none",
+            color: "blue",
+            textDecoration: "underline",
+            cursor: "pointer"
+          }}
+        >
+          Already have an account? Login
         </button>
       </form>
-
-      <p>
-        Already have an account?{" "}
-        <a href="/login">Login</a>
-      </p>
     </div>
   );
 }

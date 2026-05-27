@@ -1,11 +1,11 @@
 import { useState, useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../../Context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { login } from "../../../api/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setToken, setUser } = useContext(AuthContext);
+  const location = useLocation();
+  const { login } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,23 +19,18 @@ export default function LoginPage() {
 
     const result = await login(email, password);
 
-    //  Login failed
+    // express-validator or backend errors
     if (!result.success) {
-      setError(result.message || "Login failed");
+      setError(result.message);
       setLoading(false);
       return;
     }
 
-    //  Login succeeded
-    const token = result.data.token;
-    setToken(token);
-
-    // Decode token
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    setUser({ id: payload.id });
+    // SUCCESS → redirect back to where user came from
+    const from = location.state?.from || "/";
+    navigate(from, { replace: true });
 
     setLoading(false);
-    navigate("/dashboard");
   };
 
   return (
