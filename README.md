@@ -10,17 +10,17 @@ Backend URL (Render): https://bleachedtiresautorepair.onrender.com/
 Core Features:
 
     User Authentication (login/signup with JWT)
-
+        logging in and signing up with jwt token auth.
     Appointment Booking
-
+        Creating,Updating Reading and Deleting Apppointments.
     AI Service Recommendation
-
+        The AI service is a Local AI that takes a prompt and tells you what service you should use.
     Service List
-
+        A list of all the services and their description,price and duration.
     Contact Page
-
+        A place to find company information
     Dashboard Overview
-
+        The main hub that has every feature path.
 4. Tech Stack
 Break it into frontend, backend, and database:
 
@@ -174,3 +174,6 @@ GitHub: https://github.com/TheBankaiedBot (github.com in Bing)
 
 11. License
 This project is for educational and portfolio use.
+
+12. AI Usage
+In the making of the project, I consistently used AI as a guide, not a builder but a blueprint and teacher. I uesd it to help with structure and the heaviest use was for debugging.
